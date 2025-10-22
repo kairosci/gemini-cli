@@ -420,8 +420,8 @@
     teeny-request "^9.0.0"
     uuid "^8.0.0"
 
-"@google/gemini-cli-a2a-server@file:/home/alessio/Progetti/gemini-cli/packages/a2a-server":
-  version "0.11.0-nightly.20251020.a96f0659"
+"@google/gemini-cli-a2a-server@file:/home/alessio/Progetti/cp-gemini-cli/packages/a2a-server":
+  version "0.11.0-nightly.20251021.e72c00cf"
   resolved "file:packages/a2a-server"
   dependencies:
     "@a2a-js/sdk" "^0.3.2"
@@ -433,8 +433,8 @@
     uuid "^11.1.0"
     winston "^3.17.0"
 
-"@google/gemini-cli-core@file:../core", "@google/gemini-cli-core@file:/home/alessio/Progetti/gemini-cli/packages/core":
-  version "0.11.0-nightly.20251020.a96f0659"
+"@google/gemini-cli-core@file:../core", "@google/gemini-cli-core@file:/home/alessio/Progetti/cp-gemini-cli/packages/core":
+  version "0.11.0-nightly.20251021.e72c00cf"
   resolved "file:packages/core"
   dependencies:
     "@google-cloud/logging" "^11.2.1"
@@ -491,12 +491,12 @@
     "@lydell/node-pty-win32-x64" "1.1.0"
     node-pty "^1.0.0"
 
-"@google/gemini-cli-test-utils@file:../test-utils", "@google/gemini-cli-test-utils@file:/home/alessio/Progetti/gemini-cli/packages/test-utils":
-  version "0.11.0-nightly.20251020.a96f0659"
+"@google/gemini-cli-test-utils@file:../test-utils", "@google/gemini-cli-test-utils@file:/home/alessio/Progetti/cp-gemini-cli/packages/test-utils":
+  version "0.11.0-nightly.20251021.e72c00cf"
   resolved "file:packages/test-utils"
 
-"@google/gemini-cli@file:/home/alessio/Progetti/gemini-cli/packages/cli":
-  version "0.11.0-nightly.20251020.a96f0659"
+"@google/gemini-cli@file:/home/alessio/Progetti/cp-gemini-cli/packages/cli":
+  version "0.11.0-nightly.20251021.e72c00cf"
   resolved "file:packages/cli"
   dependencies:
     "@google/gemini-cli-core" "file:../core"
@@ -4387,8 +4387,8 @@ gcp-metadata@^6.0.0, gcp-metadata@^6.1.0:
     google-logging-utils "^0.0.2"
     json-bigint "^1.0.0"
 
-"gemini-cli-vscode-ide-companion@file:/home/alessio/Progetti/gemini-cli/packages/vscode-ide-companion":
-  version "0.11.0-nightly.20251020.a96f0659"
+"gemini-cli-vscode-ide-companion@file:/home/alessio/Progetti/cp-gemini-cli/packages/vscode-ide-companion":
+  version "0.11.0-nightly.20251021.e72c00cf"
   resolved "file:packages/vscode-ide-companion"
   dependencies:
     "@modelcontextprotocol/sdk" "^1.15.1"

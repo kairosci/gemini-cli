@@ -197,6 +197,7 @@ export interface SlashCommand {
 
   // Optional metadata for extension commands
   extensionName?: string;
+  extensionId?: string;
 
   // The action to run. Optional for parent commands that only group sub-commands.
   action?: (

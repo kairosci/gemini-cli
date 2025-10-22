@@ -14,7 +14,6 @@ import {
   ExtensionStorage,
   INSTALL_METADATA_FILENAME,
   INSTALL_WARNING_MESSAGE,
-  annotateActiveExtensions,
   disableExtension,
   enableExtension,
   installOrUpdateExtension,
@@ -22,6 +21,7 @@ import {
   loadExtensionConfig,
   loadExtensions,
   uninstallExtension,
+  hashValue,
 } from './extension.js';
 import {
   GEMINI_DIR,
@@ -202,7 +202,7 @@ describe('extension tests', () => {
       ]);
     });
 
-    it('should filter out disabled extensions', () => {
+    it('should annotate disabled extensions', () => {
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'disabled-extension',
@@ -213,20 +213,19 @@ describe('extension tests', () => {
         name: 'enabled-extension',
         version: '2.0.0',
       });
+      const manager = new ExtensionEnablementManager();
       disableExtension(
         'disabled-extension',
         SettingScope.User,
+        manager,
         tempWorkspaceDir,
       );
-      const manager = new ExtensionEnablementManager();
       const extensions = loadExtensions(manager);
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        tempWorkspaceDir,
-        manager,
-      ).filter((e) => e.isActive);
-      expect(activeExtensions).toHaveLength(1);
-      expect(activeExtensions[0].name).toBe('enabled-extension');
+      expect(extensions).toHaveLength(2);
+      expect(extensions[0].name).toBe('disabled-extension');
+      expect(extensions[0].isActive).toBe(false);
+      expect(extensions[1].name).toBe('enabled-extension');
+      expect(extensions[1].isActive).toBe(true);
     });
 
     it('should hydrate variables', () => {
@@ -475,6 +474,7 @@ describe('extension tests', () => {
       const extension = loadExtension({
         extensionDir: badExtDir,
         workspaceDir: tempWorkspaceDir,
+        extensionEnablementManager: new ExtensionEnablementManager(),
       });
 
       expect(extension).toBeNull();
@@ -499,6 +499,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -521,6 +522,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -543,6 +545,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -565,6 +568,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -587,6 +591,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -614,6 +619,7 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir: new ExtensionStorage(extensionName).getExtensionDir(),
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
@@ -632,188 +638,13 @@ describe('extension tests', () => {
         const extension = loadExtension({
           extensionDir,
           workspaceDir: tempWorkspaceDir,
+          extensionEnablementManager: new ExtensionEnablementManager(),
         });
 
         const expectedHash = createHash('sha256')
           .update('no-meta-name')
           .digest('hex');
         expect(extension?.id).toBe(expectedHash);
-      });
-    });
-  });
-
-  describe('annotateActiveExtensions', () => {
-    const extensions: GeminiCLIExtension[] = [
-      {
-        path: '/path/to/ext1',
-        name: 'ext1',
-        version: '1.0.0',
-        contextFiles: [],
-        isActive: true,
-      },
-      {
-        path: '/path/to/ext2',
-        name: 'ext2',
-        version: '1.0.0',
-        contextFiles: [],
-        isActive: true,
-      },
-      {
-        path: '/path/to/ext3',
-        name: 'ext3',
-        version: '1.0.0',
-        contextFiles: [],
-        isActive: true,
-      },
-    ];
-
-    it('should mark all extensions as active if no enabled extensions are provided', () => {
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        '/path/to/workspace',
-        new ExtensionEnablementManager(),
-      );
-      expect(activeExtensions).toHaveLength(3);
-      expect(activeExtensions.every((e) => e.isActive)).toBe(true);
-    });
-
-    it('should mark only the enabled extensions as active', () => {
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        '/path/to/workspace',
-        new ExtensionEnablementManager(['ext1', 'ext3']),
-      );
-      expect(activeExtensions).toHaveLength(3);
-      expect(activeExtensions.find((e) => e.name === 'ext1')?.isActive).toBe(
-        true,
-      );
-      expect(activeExtensions.find((e) => e.name === 'ext2')?.isActive).toBe(
-        false,
-      );
-      expect(activeExtensions.find((e) => e.name === 'ext3')?.isActive).toBe(
-        true,
-      );
-    });
-
-    it('should mark all extensions as inactive when "none" is provided', () => {
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        '/path/to/workspace',
-        new ExtensionEnablementManager(['none']),
-      );
-      expect(activeExtensions).toHaveLength(3);
-      expect(activeExtensions.every((e) => !e.isActive)).toBe(true);
-    });
-
-    it('should handle case-insensitivity', () => {
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        '/path/to/workspace',
-        new ExtensionEnablementManager(['EXT1']),
-      );
-      expect(activeExtensions.find((e) => e.name === 'ext1')?.isActive).toBe(
-        true,
-      );
-    });
-
-    it('should log an error for unknown extensions', () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-      annotateActiveExtensions(
-        extensions,
-        '/path/to/workspace',
-        new ExtensionEnablementManager(['ext4']),
-      );
-      expect(consoleSpy).toHaveBeenCalledWith('Extension not found: ext4');
-      consoleSpy.mockRestore();
-    });
-
-    describe('autoUpdate', () => {
-      it('should be false if autoUpdate is not set in install metadata', () => {
-        const activeExtensions = annotateActiveExtensions(
-          extensions,
-          tempHomeDir,
-          new ExtensionEnablementManager(),
-        );
-        expect(
-          activeExtensions.every(
-            (e) => e.installMetadata?.autoUpdate === false,
-          ),
-        ).toBe(false);
-      });
-
-      it('should be true if autoUpdate is true in install metadata', () => {
-        const extensionsWithAutoUpdate: GeminiCLIExtension[] = extensions.map(
-          (e) => ({
-            ...e,
-            installMetadata: {
-              ...e.installMetadata!,
-              autoUpdate: true,
-            },
-          }),
-        );
-        const activeExtensions = annotateActiveExtensions(
-          extensionsWithAutoUpdate,
-          tempHomeDir,
-          new ExtensionEnablementManager(),
-        );
-        expect(
-          activeExtensions.every((e) => e.installMetadata?.autoUpdate === true),
-        ).toBe(true);
-      });
-
-      it('should respect the per-extension settings from install metadata', () => {
-        const extensionsWithAutoUpdate: GeminiCLIExtension[] = [
-          {
-            path: '/path/to/ext1',
-            name: 'ext1',
-            version: '1.0.0',
-            contextFiles: [],
-            installMetadata: {
-              source: 'test',
-              type: 'local',
-              autoUpdate: true,
-            },
-            isActive: true,
-          },
-          {
-            path: '/path/to/ext2',
-            name: 'ext2',
-            version: '1.0.0',
-            contextFiles: [],
-            installMetadata: {
-              source: 'test',
-              type: 'local',
-              autoUpdate: false,
-            },
-            isActive: true,
-          },
-          {
-            path: '/path/to/ext3',
-            name: 'ext3',
-            version: '1.0.0',
-            contextFiles: [],
-            isActive: true,
-          },
-        ];
-        const activeExtensions = annotateActiveExtensions(
-          extensionsWithAutoUpdate,
-          tempHomeDir,
-          new ExtensionEnablementManager(),
-        );
-        expect(
-          activeExtensions.find((e) => e.name === 'ext1')?.installMetadata
-            ?.autoUpdate,
-        ).toBe(true);
-        expect(
-          activeExtensions.find((e) => e.name === 'ext2')?.installMetadata
-            ?.autoUpdate,
-        ).toBe(false);
-        expect(
-          activeExtensions.find((e) => e.name === 'ext3')?.installMetadata
-            ?.autoUpdate,
-        ).toBe(undefined);
       });
     });
   });
@@ -1192,6 +1023,7 @@ This extension will run the following MCP servers:
           await loadExtensionConfig({
             extensionDir: sourceExtDir,
             workspaceDir: process.cwd(),
+            extensionEnablementManager: new ExtensionEnablementManager(),
           }),
         ),
       ).resolves.toBe('my-local-extension');
@@ -1426,6 +1258,10 @@ This extension will run the following MCP servers:
           extensionsDir: userExtensionsDir,
           name: 'my-local-extension',
           version: '1.0.0',
+          installMetadata: {
+            source: userExtensionsDir,
+            type: 'local',
+          },
         });
 
         await uninstallExtension('my-local-extension', isUpdate);
@@ -1436,7 +1272,8 @@ This extension will run the following MCP servers:
         } else {
           expect(mockLogExtensionUninstall).toHaveBeenCalled();
           expect(ExtensionUninstallEvent).toHaveBeenCalledWith(
-            'my-local-extension',
+            hashValue('my-local-extension'),
+            hashValue(userExtensionsDir),
             'success',
           );
         }
@@ -1480,7 +1317,8 @@ This extension will run the following MCP servers:
       expect(fs.existsSync(sourceExtDir)).toBe(false);
       expect(mockLogExtensionUninstall).toHaveBeenCalled();
       expect(ExtensionUninstallEvent).toHaveBeenCalledWith(
-        'gemini-sql-extension',
+        hashValue('gemini-sql-extension'),
+        hashValue('https://github.com/google/gemini-sql-extension'),
         'success',
       );
     });
@@ -1510,7 +1348,11 @@ This extension will run the following MCP servers:
         version: '1.0.0',
       });
 
-      disableExtension('my-extension', SettingScope.User);
+      disableExtension(
+        'my-extension',
+        SettingScope.User,
+        new ExtensionEnablementManager(),
+      );
       expect(
         isEnabled({
           name: 'my-extension',
@@ -1529,6 +1371,7 @@ This extension will run the following MCP servers:
       disableExtension(
         'my-extension',
         SettingScope.Workspace,
+        new ExtensionEnablementManager(),
         tempWorkspaceDir,
       );
       expect(
@@ -1552,8 +1395,16 @@ This extension will run the following MCP servers:
         version: '1.0.0',
       });
 
-      disableExtension('my-extension', SettingScope.User);
-      disableExtension('my-extension', SettingScope.User);
+      disableExtension(
+        'my-extension',
+        SettingScope.User,
+        new ExtensionEnablementManager(),
+      );
+      disableExtension(
+        'my-extension',
+        SettingScope.User,
+        new ExtensionEnablementManager(),
+      );
       expect(
         isEnabled({
           name: 'my-extension',
@@ -1564,7 +1415,11 @@ This extension will run the following MCP servers:
 
     it('should throw an error if you request system scope', () => {
       expect(() =>
-        disableExtension('my-extension', SettingScope.System),
+        disableExtension(
+          'my-extension',
+          SettingScope.System,
+          new ExtensionEnablementManager(),
+        ),
       ).toThrow('System and SystemDefaults scopes are not supported.');
     });
 
@@ -1573,13 +1428,22 @@ This extension will run the following MCP servers:
         extensionsDir: userExtensionsDir,
         name: 'ext1',
         version: '1.0.0',
+        installMetadata: {
+          source: userExtensionsDir,
+          type: 'local',
+        },
       });
 
-      disableExtension('ext1', SettingScope.Workspace);
+      disableExtension(
+        'ext1',
+        SettingScope.Workspace,
+        new ExtensionEnablementManager(),
+      );
 
       expect(mockLogExtensionDisable).toHaveBeenCalled();
       expect(ExtensionDisableEvent).toHaveBeenCalledWith(
-        'ext1',
+        hashValue('ext1'),
+        hashValue(userExtensionsDir),
         SettingScope.Workspace,
       );
     });
@@ -1593,12 +1457,7 @@ This extension will run the following MCP servers:
     const getActiveExtensions = (): GeminiCLIExtension[] => {
       const manager = new ExtensionEnablementManager();
       const extensions = loadExtensions(manager);
-      const activeExtensions = annotateActiveExtensions(
-        extensions,
-        tempWorkspaceDir,
-        manager,
-      );
-      return activeExtensions.filter((e) => e.isActive);
+      return extensions.filter((e) => e.isActive);
     };
 
     it('should enable an extension at the user scope', () => {
@@ -1607,11 +1466,12 @@ This extension will run the following MCP servers:
         name: 'ext1',
         version: '1.0.0',
       });
-      disableExtension('ext1', SettingScope.User);
+      const extensionEnablementManager = new ExtensionEnablementManager();
+      disableExtension('ext1', SettingScope.User, extensionEnablementManager);
       let activeExtensions = getActiveExtensions();
       expect(activeExtensions).toHaveLength(0);
 
-      enableExtension('ext1', SettingScope.User);
+      enableExtension('ext1', SettingScope.User, extensionEnablementManager);
       activeExtensions = getActiveExtensions();
       expect(activeExtensions).toHaveLength(1);
       expect(activeExtensions[0].name).toBe('ext1');
@@ -1623,11 +1483,20 @@ This extension will run the following MCP servers:
         name: 'ext1',
         version: '1.0.0',
       });
-      disableExtension('ext1', SettingScope.Workspace);
+      const extensionEnablementManager = new ExtensionEnablementManager();
+      disableExtension(
+        'ext1',
+        SettingScope.Workspace,
+        extensionEnablementManager,
+      );
       let activeExtensions = getActiveExtensions();
       expect(activeExtensions).toHaveLength(0);
 
-      enableExtension('ext1', SettingScope.Workspace);
+      enableExtension(
+        'ext1',
+        SettingScope.Workspace,
+        extensionEnablementManager,
+      );
       activeExtensions = getActiveExtensions();
       expect(activeExtensions).toHaveLength(1);
       expect(activeExtensions[0].name).toBe('ext1');
@@ -1638,13 +1507,27 @@ This extension will run the following MCP servers:
         extensionsDir: userExtensionsDir,
         name: 'ext1',
         version: '1.0.0',
+        installMetadata: {
+          source: userExtensionsDir,
+          type: 'local',
+        },
       });
-      disableExtension('ext1', SettingScope.Workspace);
-      enableExtension('ext1', SettingScope.Workspace);
+      const extensionEnablementManager = new ExtensionEnablementManager();
+      disableExtension(
+        'ext1',
+        SettingScope.Workspace,
+        extensionEnablementManager,
+      );
+      enableExtension(
+        'ext1',
+        SettingScope.Workspace,
+        extensionEnablementManager,
+      );
 
       expect(mockLogExtensionEnable).toHaveBeenCalled();
       expect(ExtensionEnableEvent).toHaveBeenCalledWith(
-        'ext1',
+        hashValue('ext1'),
+        hashValue(userExtensionsDir),
         SettingScope.Workspace,
       );
     });

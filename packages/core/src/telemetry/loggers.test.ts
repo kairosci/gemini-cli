@@ -201,6 +201,7 @@ describe('loggers', () => {
         getTargetDir: () => 'target-dir',
         getProxy: () => 'http://test.proxy.com:8080',
         getOutputFormat: () => OutputFormat.JSON,
+        getExtensions: () => [],
       } as unknown as Config;
 
       const startSessionEvent = new StartSessionEvent(mockConfig);
@@ -229,6 +230,8 @@ describe('loggers', () => {
           mcp_tools: undefined,
           mcp_tools_count: undefined,
           output_format: 'json',
+          extension_ids: '',
+          extensions_count: 0,
         },
       });
     });
@@ -1014,6 +1017,10 @@ describe('loggers', () => {
           },
           required: ['arg1', 'arg2'],
         },
+        false,
+        undefined,
+        undefined,
+        'test-extension',
       );
 
       const call: CompletedToolCall = {
@@ -1048,6 +1055,7 @@ describe('loggers', () => {
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
+          extension_id: 'test-extension',
           function_name: 'mock_mcp_tool',
           function_args: JSON.stringify(
             {
@@ -1066,6 +1074,7 @@ describe('loggers', () => {
           error: undefined,
           error_type: undefined,
           metadata: undefined,
+          content_length: undefined,
         },
       });
     });
@@ -1282,7 +1291,8 @@ describe('loggers', () => {
 
     it('should log extension install event', () => {
       const event = new ExtensionInstallEvent(
-        'vscode',
+        'testing',
+        'testing-id',
         '0.1.0',
         'git',
         'success',
@@ -1295,14 +1305,14 @@ describe('loggers', () => {
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Installed extension vscode',
+        body: 'Installed extension testing',
         attributes: {
           'session.id': 'test-session-id',
           'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_INSTALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
-          extension_name: 'vscode',
+          extension_name: 'testing',
           extension_version: '0.1.0',
           extension_source: 'git',
           status: 'success',
@@ -1330,7 +1340,8 @@ describe('loggers', () => {
 
     it('should log extension update event', () => {
       const event = new ExtensionUpdateEvent(
-        'vscode',
+        'testing',
+        'testing-id',
         '0.1.0',
         '0.1.1',
         'git',
@@ -1344,14 +1355,14 @@ describe('loggers', () => {
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Updated extension vscode',
+        body: 'Updated extension testing',
         attributes: {
           'session.id': 'test-session-id',
           'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_UPDATE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
-          extension_name: 'vscode',
+          extension_name: 'testing',
           extension_version: '0.1.0',
           extension_previous_version: '0.1.1',
           extension_source: 'git',
@@ -1379,7 +1390,11 @@ describe('loggers', () => {
     });
 
     it('should log extension uninstall event', () => {
-      const event = new ExtensionUninstallEvent('vscode', 'success');
+      const event = new ExtensionUninstallEvent(
+        'testing',
+        'testing-id',
+        'success',
+      );
 
       logExtensionUninstall(mockConfig, event);
 
@@ -1388,14 +1403,14 @@ describe('loggers', () => {
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Uninstalled extension vscode',
+        body: 'Uninstalled extension testing',
         attributes: {
           'session.id': 'test-session-id',
           'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_UNINSTALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
-          extension_name: 'vscode',
+          extension_name: 'testing',
           status: 'success',
         },
       });
@@ -1417,7 +1432,7 @@ describe('loggers', () => {
     });
 
     it('should log extension enable event', () => {
-      const event = new ExtensionEnableEvent('vscode', 'user');
+      const event = new ExtensionEnableEvent('testing', 'testing-id', 'user');
 
       logExtensionEnable(mockConfig, event);
 
@@ -1426,14 +1441,14 @@ describe('loggers', () => {
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Enabled extension vscode',
+        body: 'Enabled extension testing',
         attributes: {
           'session.id': 'test-session-id',
           'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_ENABLE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
-          extension_name: 'vscode',
+          extension_name: 'testing',
           setting_scope: 'user',
         },
       });
@@ -1455,7 +1470,7 @@ describe('loggers', () => {
     });
 
     it('should log extension disable event', () => {
-      const event = new ExtensionDisableEvent('vscode', 'user');
+      const event = new ExtensionDisableEvent('testing', 'testing-id', 'user');
 
       logExtensionDisable(mockConfig, event);
 
@@ -1464,14 +1479,14 @@ describe('loggers', () => {
       ).toHaveBeenCalledWith(event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Disabled extension vscode',
+        body: 'Disabled extension testing',
         attributes: {
           'session.id': 'test-session-id',
           'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_DISABLE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
-          extension_name: 'vscode',
+          extension_name: 'testing',
           setting_scope: 'user',
         },
       });

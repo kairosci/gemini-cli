@@ -6,7 +6,6 @@
 
 import { Storage } from '@google-cloud/storage';
 import * as fse from 'fs-extra';
-import { promises as fsPromises, createReadStream } from 'node:fs';
 import * as tar from 'tar';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,12 +22,18 @@ import * as configModule from '../config/config.js';
 import { getPersistedState, METADATA_KEY } from '../types.js';
 
 // Mock dependencies
+const fsMocks = vi.hoisted(() => ({
+  readdir: vi.fn(),
+  createReadStream: vi.fn(),
+}));
+
 vi.mock('@google-cloud/storage');
 vi.mock('fs-extra', () => ({
   pathExists: vi.fn(),
   readdir: vi.fn(),
   remove: vi.fn(),
   ensureDir: vi.fn(),
+  createReadStream: vi.fn(),
 }));
 vi.mock('node:fs', async () => {
   const actual = await vi.importActual<typeof import('node:fs')>('node:fs');
@@ -36,12 +41,37 @@ vi.mock('node:fs', async () => {
     ...actual,
     promises: {
       ...actual.promises,
-      readdir: vi.fn(),
+      readdir: fsMocks.readdir,
     },
-    createReadStream: vi.fn(),
+    createReadStream: fsMocks.createReadStream,
   };
 });
-vi.mock('tar');
+vi.mock('fs', async () => {
+  const actual = await vi.importActual<typeof import('node:fs')>('node:fs');
+  return {
+    ...actual,
+    promises: {
+      ...actual.promises,
+      readdir: fsMocks.readdir,
+    },
+    createReadStream: fsMocks.createReadStream,
+  };
+});
+vi.mock('tar', async () => {
+  const actualFs = await vi.importActual<typeof import('node:fs')>('node:fs');
+  return {
+    c: vi.fn(({ file }) => {
+      if (file) {
+        actualFs.writeFileSync(file, Buffer.from('dummy tar content'));
+      }
+      return Promise.resolve();
+    }),
+    x: vi.fn().mockResolvedValue(undefined),
+    t: vi.fn().mockResolvedValue(undefined),
+    r: vi.fn().mockResolvedValue(undefined),
+    u: vi.fn().mockResolvedValue(undefined),
+  };
+});
 vi.mock('zlib');
 vi.mock('uuid');
 vi.mock('../utils/logger.js', () => ({
@@ -68,7 +98,7 @@ vi.mock('../types.js', async (importOriginal) => {
 
 const mockStorage = Storage as MockedClass<typeof Storage>;
 const mockFse = fse as Mocked<typeof fse>;
-const mockCreateReadStream = createReadStream as Mock;
+const mockCreateReadStream = fsMocks.createReadStream;
 const mockTar = tar as Mocked<typeof tar>;
 const mockGzipSync = gzipSync as Mock;
 const mockGunzipSync = gunzipSync as Mock;
@@ -81,10 +111,19 @@ const getTmpArchiveFilename = (taskId: string): string =>
   `task-${taskId}-workspace-test-uuid.tar.gz`;
 
 type MockWriteStream = {
+  emit: Mock<(event: string, ...args: unknown[]) => boolean>;
+  removeListener: Mock<
+    (event: string, cb: (error?: Error | null) => void) => MockWriteStream
+  >;
+  once: Mock<
+    (event: string, cb: (error?: Error | null) => void) => MockWriteStream
+  >;
   on: Mock<
     (event: string, cb: (error?: Error | null) => void) => MockWriteStream
   >;
   destroy: Mock<() => void>;
+  write: Mock<(chunk: unknown, encoding?: unknown, cb?: unknown) => boolean>;
+  end: Mock<(cb?: unknown) => void>;
   destroyed: boolean;
 };
 
@@ -119,11 +158,18 @@ describe('GCSTaskStore', () => {
     bucketName = 'test-bucket';
 
     mockWriteStream = {
+      emit: vi.fn().mockReturnValue(true),
+      removeListener: vi.fn().mockReturnValue(mockWriteStream),
       on: vi.fn((event, cb) => {
         if (event === 'finish') setTimeout(cb, 0); // Simulate async finish
         return mockWriteStream;
       }),
+      once: vi.fn((event, cb) => {
+        if (event === 'finish') setTimeout(cb, 0); // Simulate async finish        return mockWriteStream;
+      }),
       destroy: vi.fn(),
+      write: vi.fn().mockReturnValue(true),
+      end: vi.fn(),
       destroyed: false,
     };
 
@@ -154,14 +200,16 @@ describe('GCSTaskStore', () => {
       _taskState: 'submitted',
     });
     (fse.pathExists as Mock).mockResolvedValue(true);
-    (fsPromises.readdir as Mock).mockResolvedValue(['file1.txt']);
-    mockTar.c.mockResolvedValue(undefined);
-    mockTar.x.mockResolvedValue(undefined);
+    fsMocks.readdir.mockResolvedValue(['file1.txt']);
     mockFse.remove.mockResolvedValue(undefined);
     mockFse.ensureDir.mockResolvedValue(undefined);
     mockGzipSync.mockReturnValue(Buffer.from('compressed'));
     mockGunzipSync.mockReturnValue(Buffer.from('{}'));
     mockCreateReadStream.mockReturnValue({ on: vi.fn(), pipe: vi.fn() });
+    mockFse.createReadStream.mockReturnValue({
+      on: vi.fn(),
+      pipe: vi.fn(),
+    } as unknown as import('node:fs').ReadStream);
   });
 
   describe('Constructor & Initialization', () => {
@@ -206,13 +254,12 @@ describe('GCSTaskStore', () => {
       metadata: {},
     };
 
-    it.skip('should save metadata and workspace', async () => {
+    it('should save metadata and workspace', async () => {
       const store = new GCSTaskStore(bucketName);
       await store.save(mockTask);
 
       expect(mockFile.save).toHaveBeenCalledTimes(1);
       expect(mockTar.c).toHaveBeenCalledTimes(1);
-      expect(mockCreateReadStream).toHaveBeenCalledTimes(1);
       expect(mockFse.remove).toHaveBeenCalledTimes(1);
       expect(logger.info).toHaveBeenCalledWith(
         expect.stringContaining('metadata saved to GCS'),

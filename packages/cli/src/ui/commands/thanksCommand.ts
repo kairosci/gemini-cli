@@ -16,6 +16,17 @@ export const thanksCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   hidden: true, // Hide from /help list
   action: async (context, _args) => {
+    if (!context.session.lastGeminiResponsePromptId) {
+      context.ui.addItem(
+        {
+          type: 'info',
+          text: 'There is no recent AI response to give feedback on.',
+        },
+        Date.now(),
+      );
+      return;
+    }
+
     context.ui.addItem(
       {
         type: 'info',
@@ -25,17 +36,14 @@ export const thanksCommand: SlashCommand = {
     );
 
     // Log positive feedback telemetry
-    if (context.session.lastGeminiResponsePromptId) {
-      // Ensure context.services.config is not null before passing
-      if (context.services.config) {
-        logUserPositiveFeedback(
-          context.services.config,
-          new UserPositiveFeedbackEvent(
-            context.session.lastGeminiResponsePromptId,
-          ),
-        );
-      }
+    if (context.services.config) {
+      logUserPositiveFeedback(
+        context.services.config,
+        new UserPositiveFeedbackEvent(
+          context.session.lastGeminiResponsePromptId,
+        ),
+      );
     }
-    return; // Indicate that the command was handled and no further action is needed by returning void
+    return;
   },
 };

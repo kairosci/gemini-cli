@@ -37,6 +37,7 @@ import type {
   RecoveryAttemptEvent,
   WebFetchFallbackAttemptEvent,
   ExtensionUpdateEvent,
+  UserPositiveFeedbackEvent,
 } from '../types.js';
 import { EventMetadataKey } from './event-metadata-key.js';
 import type { Config } from '../../config/config.js';
@@ -92,6 +93,7 @@ export enum EventNames {
   AGENT_FINISH = 'agent_finish',
   RECOVERY_ATTEMPT = 'recovery_attempt',
   WEB_FETCH_FALLBACK_ATTEMPT = 'web_fetch_fallback_attempt',
+  USER_POSITIVE_FEEDBACK = 'user_positive_feedback',
 }
 
 export interface LogResponse {
@@ -1265,6 +1267,23 @@ export class ClearcutLogger {
 
     this.enqueueLogEvent(
       this.createLogEvent(EventNames.WEB_FETCH_FALLBACK_ATTEMPT, data),
+    );
+    this.flushIfNeeded();
+  }
+
+  logUserPositiveFeedbackEvent(event: UserPositiveFeedbackEvent): void {
+    const data: EventValue[] = [
+      {
+        gemini_cli_key: EventMetadataKey.GEMINI_CLI_PROMPT_ID,
+        value: event.prompt_id,
+      },
+      {
+        gemini_cli_key: EventMetadataKey.GEMINI_CLI_RESEARCH_FEEDBACK_TYPE,
+        value: event.feedback_type,
+      },
+    ];
+    this.enqueueLogEvent(
+      this.createLogEvent(EventNames.USER_POSITIVE_FEEDBACK, data),
     );
     this.flushIfNeeded();
   }

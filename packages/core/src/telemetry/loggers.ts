@@ -48,6 +48,7 @@ import type {
   RecoveryAttemptEvent,
   WebFetchFallbackAttemptEvent,
   ExtensionUpdateEvent,
+  UserPositiveFeedbackEvent,
 } from './types.js';
 import {
   recordApiErrorMetrics,
@@ -645,6 +646,21 @@ export function logWebFetchFallbackAttempt(
   event: WebFetchFallbackAttemptEvent,
 ): void {
   ClearcutLogger.getInstance(config)?.logWebFetchFallbackAttemptEvent(event);
+  if (!isTelemetrySdkInitialized()) return;
+
+  const logger = logs.getLogger(SERVICE_NAME);
+  const logRecord: LogRecord = {
+    body: event.toLogBody(),
+    attributes: event.toOpenTelemetryAttributes(config),
+  };
+  logger.emit(logRecord);
+}
+
+export function logUserPositiveFeedback(
+  config: Config,
+  event: UserPositiveFeedbackEvent,
+): void {
+  ClearcutLogger.getInstance(config)?.logUserPositiveFeedbackEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const logger = logs.getLogger(SERVICE_NAME);

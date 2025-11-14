@@ -49,6 +49,7 @@ import type {
   WebFetchFallbackAttemptEvent,
   ExtensionUpdateEvent,
   UserPositiveFeedbackEvent,
+  LlmLoopCheckEvent,
 } from './types.js';
 import {
   recordApiErrorMetrics,

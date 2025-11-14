@@ -38,6 +38,7 @@ import type {
   WebFetchFallbackAttemptEvent,
   ExtensionUpdateEvent,
   UserPositiveFeedbackEvent,
+  LlmLoopCheckEvent,
 } from '../types.js';
 import { EventMetadataKey } from './event-metadata-key.js';
 import type { Config } from '../../config/config.js';
@@ -94,6 +95,7 @@ export enum EventNames {
   RECOVERY_ATTEMPT = 'recovery_attempt',
   WEB_FETCH_FALLBACK_ATTEMPT = 'web_fetch_fallback_attempt',
   USER_POSITIVE_FEEDBACK = 'user_positive_feedback',
+  LLM_LOOP_CHECK = 'llm_loop_check',
 }
 
 export interface LogResponse {
@@ -736,6 +738,14 @@ export class ClearcutLogger {
         value: JSON.stringify(event.loop_type),
       },
     ];
+
+    if (event.confirmed_by_model) {
+      data.push({
+        gemini_cli_key:
+          EventMetadataKey.GEMINI_CLI_LOOP_DETECTED_CONFIRMED_BY_MODEL,
+        value: event.confirmed_by_model,
+      });
+    }
 
     this.enqueueLogEvent(this.createLogEvent(EventNames.LOOP_DETECTED, data));
     this.flushIfNeeded();

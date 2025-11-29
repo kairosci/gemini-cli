@@ -18,34 +18,34 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.Foreground,
     },
     'hljs-keyword': {
-      color: darkTheme.AccentPurple, // Keywords like 'function', 'const', 'import'
+      color: darkTheme.AccentPurple,
     },
     'hljs-built_in': {
-      color: darkTheme.AccentCyan, // Built-in functions/types like 'console', 'Array'
+      color: darkTheme.AccentCyan,
     },
     'hljs-type': {
-      color: darkTheme.AccentCyan, // Types like 'string', 'number', 'boolean'
+      color: darkTheme.AccentCyan,
     },
     'hljs-literal': {
-      color: darkTheme.AccentBlue, // Boolean, null, undefined
+      color: darkTheme.AccentBlue,
     },
     'hljs-number': {
-      color: darkTheme.AccentGreen, // Numbers
+      color: darkTheme.AccentGreen,
     },
     'hljs-string': {
-      color: darkTheme.AccentYellow, // Strings
+      color: darkTheme.AccentYellow,
     },
     'hljs-regexp': {
-      color: darkTheme.AccentRed, // Regular expressions
+      color: darkTheme.AccentRed,
     },
     'hljs-variable': {
-      color: darkTheme.LightBlue, // Variables
+      color: darkTheme.LightBlue,
     },
     'hljs-template-variable': {
       color: darkTheme.LightBlue,
     },
     'hljs-attr': {
-      color: darkTheme.LightBlue, // Object properties, HTML attributes
+      color: darkTheme.LightBlue,
     },
     'hljs-attribute': {
       color: darkTheme.LightBlue,
@@ -54,55 +54,55 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.LightBlue,
     },
     'hljs-meta': {
-      color: darkTheme.AccentBlue, // Preprocessor directives, annotations
+      color: darkTheme.AccentBlue,
     },
     'hljs-meta-keyword': {
       color: darkTheme.AccentBlue,
     },
     'hljs-tag': {
-      color: darkTheme.AccentBlue, // HTML/XML tags
+      color: darkTheme.AccentBlue,
     },
     'hljs-name': {
-      color: darkTheme.AccentBlue, // Function/class names
+      color: darkTheme.AccentBlue,
     },
     'hljs-selector-tag': {
-      color: darkTheme.AccentBlue, // CSS selector tags
+      color: darkTheme.AccentBlue,
     },
     'hljs-function': {
-      color: darkTheme.AccentGreen, // Function declarations
+      color: darkTheme.AccentGreen,
     },
     'hljs-title': {
-      color: darkTheme.AccentGreen, // Class/function titles
+      color: darkTheme.AccentGreen,
     },
     'hljs-class': {
-      color: darkTheme.AccentGreen, // Class declarations
+      color: darkTheme.AccentGreen,
     },
     'hljs-comment': {
-      color: darkTheme.Comment, // Comments
+      color: darkTheme.Comment,
       fontStyle: 'italic',
     },
     'hljs-quote': {
-      color: darkTheme.Comment, // Block quotes
+      color: darkTheme.Comment,
       fontStyle: 'italic',
     },
     'hljs-doctag': {
-      color: darkTheme.Comment, // Javadoc/docblock tags
+      color: darkTheme.Comment,
     },
     'hljs-link': {
       color: darkTheme.AccentBlue,
       textDecoration: 'underline',
     },
     'hljs-subst': {
-      color: darkTheme.Foreground, // Interpolated code in template strings
+      color: darkTheme.Foreground,
     },
     'hljs-params': {
-      color: darkTheme.Foreground, // Function parameters
+      color: darkTheme.Foreground,
     },
     'hljs-formula': {
       color: darkTheme.Foreground,
     },
     'hljs-section': {
-      color: darkTheme.AccentYellow, // Markdown sections
+      color: darkTheme.AccentYellow,
     },
     'hljs-emphasis': {
       fontStyle: 'italic',
@@ -111,19 +111,19 @@ export const DefaultDark: Theme = new Theme(
       fontWeight: 'bold',
     },
     'hljs-bullet': {
-      color: darkTheme.AccentYellow, // List bullets
+      color: darkTheme.AccentYellow,
     },
     'hljs-selector-id': {
-      color: darkTheme.AccentRed, // CSS IDs
+      color: darkTheme.AccentRed,
     },
     'hljs-selector-class': {
-      color: darkTheme.AccentYellow, // CSS classes
+      color: darkTheme.AccentYellow,
     },
     'hljs-selector-attr': {
-      color: darkTheme.AccentYellow, // CSS attributes
+      color: darkTheme.AccentYellow,
     },
     'hljs-selector-pseudo': {
-      color: darkTheme.AccentYellow, // CSS pseudo-classes
+      color: darkTheme.AccentYellow,
     },
     'hljs-template-tag': {
       color: darkTheme.AccentBlue,

@@ -64,7 +64,7 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.Foreground,
     },
     'hljs-title': {
-      color: darkTheme.Foreground,
+      color: darkTheme.AccentGreen,
     },
     'hljs-params': {
       color: darkTheme.Foreground,
@@ -102,6 +102,9 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.LightBlue,
     },
     'hljs-attribute': {
+      color: darkTheme.LightBlue,
+    },
+    'hljs-property': {
       color: darkTheme.LightBlue,
     },
     'hljs-builtin-name': {

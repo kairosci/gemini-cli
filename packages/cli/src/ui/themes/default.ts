@@ -18,88 +18,34 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.Foreground,
     },
     'hljs-keyword': {
-      color: darkTheme.AccentBlue,
-    },
-    'hljs-literal': {
-      color: darkTheme.AccentBlue,
-    },
-    'hljs-symbol': {
-      color: darkTheme.AccentBlue,
-    },
-    'hljs-name': {
-      color: darkTheme.AccentBlue,
-    },
-    'hljs-link': {
-      color: darkTheme.AccentBlue,
-      textDecoration: 'underline',
+      color: darkTheme.AccentPurple, // Keywords like 'function', 'const', 'import'
     },
     'hljs-built_in': {
-      color: darkTheme.AccentCyan,
+      color: darkTheme.AccentCyan, // Built-in functions/types like 'console', 'Array'
     },
     'hljs-type': {
-      color: darkTheme.AccentCyan,
+      color: darkTheme.AccentCyan, // Types like 'string', 'number', 'boolean'
+    },
+    'hljs-literal': {
+      color: darkTheme.AccentBlue, // Boolean, null, undefined
     },
     'hljs-number': {
-      color: darkTheme.AccentGreen,
-    },
-    'hljs-class': {
-      color: darkTheme.AccentGreen,
+      color: darkTheme.AccentGreen, // Numbers
     },
     'hljs-string': {
-      color: darkTheme.AccentYellow,
-    },
-    'hljs-meta-string': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // Strings
     },
     'hljs-regexp': {
-      color: darkTheme.AccentRed,
-    },
-    'hljs-template-tag': {
-      color: darkTheme.AccentRed,
-    },
-    'hljs-subst': {
-      color: darkTheme.Foreground,
-    },
-    'hljs-function': {
-      color: darkTheme.Foreground,
-    },
-    'hljs-title': {
-      color: darkTheme.AccentGreen,
-    },
-    'hljs-params': {
-      color: darkTheme.Foreground,
-    },
-    'hljs-formula': {
-      color: darkTheme.Foreground,
-    },
-    'hljs-comment': {
-      color: darkTheme.Comment,
-      fontStyle: 'italic',
-    },
-    'hljs-quote': {
-      color: darkTheme.Comment,
-      fontStyle: 'italic',
-    },
-    'hljs-doctag': {
-      color: darkTheme.Comment,
-    },
-    'hljs-meta': {
-      color: darkTheme.Gray,
-    },
-    'hljs-meta-keyword': {
-      color: darkTheme.Gray,
-    },
-    'hljs-tag': {
-      color: darkTheme.Gray,
+      color: darkTheme.AccentRed, // Regular expressions
     },
     'hljs-variable': {
-      color: darkTheme.AccentPurple,
+      color: darkTheme.LightBlue, // Variables
     },
     'hljs-template-variable': {
-      color: darkTheme.AccentPurple,
+      color: darkTheme.LightBlue,
     },
     'hljs-attr': {
-      color: darkTheme.LightBlue,
+      color: darkTheme.LightBlue, // Object properties, HTML attributes
     },
     'hljs-attribute': {
       color: darkTheme.LightBlue,
@@ -107,11 +53,56 @@ export const DefaultDark: Theme = new Theme(
     'hljs-property': {
       color: darkTheme.LightBlue,
     },
-    'hljs-builtin-name': {
-      color: darkTheme.LightBlue,
+    'hljs-meta': {
+      color: darkTheme.AccentBlue, // Preprocessor directives, annotations
+    },
+    'hljs-meta-keyword': {
+      color: darkTheme.AccentBlue,
+    },
+    'hljs-tag': {
+      color: darkTheme.AccentBlue, // HTML/XML tags
+    },
+    'hljs-name': {
+      color: darkTheme.AccentBlue, // Function/class names
+    },
+    'hljs-selector-tag': {
+      color: darkTheme.AccentBlue, // CSS selector tags
+    },
+    'hljs-function': {
+      color: darkTheme.AccentGreen, // Function declarations
+    },
+    'hljs-title': {
+      color: darkTheme.AccentGreen, // Class/function titles
+    },
+    'hljs-class': {
+      color: darkTheme.AccentGreen, // Class declarations
+    },
+    'hljs-comment': {
+      color: darkTheme.Comment, // Comments
+      fontStyle: 'italic',
+    },
+    'hljs-quote': {
+      color: darkTheme.Comment, // Block quotes
+      fontStyle: 'italic',
+    },
+    'hljs-doctag': {
+      color: darkTheme.Comment, // Javadoc/docblock tags
+    },
+    'hljs-link': {
+      color: darkTheme.AccentBlue,
+      textDecoration: 'underline',
+    },
+    'hljs-subst': {
+      color: darkTheme.Foreground, // Interpolated code in template strings
+    },
+    'hljs-params': {
+      color: darkTheme.Foreground, // Function parameters
+    },
+    'hljs-formula': {
+      color: darkTheme.Foreground,
     },
     'hljs-section': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // Markdown sections
     },
     'hljs-emphasis': {
       fontStyle: 'italic',
@@ -120,22 +111,22 @@ export const DefaultDark: Theme = new Theme(
       fontWeight: 'bold',
     },
     'hljs-bullet': {
-      color: darkTheme.AccentYellow,
-    },
-    'hljs-selector-tag': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // List bullets
     },
     'hljs-selector-id': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentRed, // CSS IDs
     },
     'hljs-selector-class': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // CSS classes
     },
     'hljs-selector-attr': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // CSS attributes
     },
     'hljs-selector-pseudo': {
-      color: darkTheme.AccentYellow,
+      color: darkTheme.AccentYellow, // CSS pseudo-classes
+    },
+    'hljs-template-tag': {
+      color: darkTheme.AccentBlue,
     },
     'hljs-addition': {
       color: darkTheme.AccentGreen,

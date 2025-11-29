@@ -138,12 +138,12 @@ export const DefaultDark: Theme = new Theme(
       color: darkTheme.AccentYellow,
     },
     'hljs-addition': {
-      backgroundColor: '#144212',
+      color: darkTheme.AccentGreen,
       display: 'inline-block',
       width: '100%',
     },
     'hljs-deletion': {
-      backgroundColor: '#600',
+      color: darkTheme.AccentRed,
       display: 'inline-block',
       width: '100%',
     },

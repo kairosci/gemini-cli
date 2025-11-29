@@ -13,6 +13,7 @@ import { GitHubLight } from './github-light.js';
 import { GoogleCode } from './googlecode.js';
 import { DefaultLight } from './default-light.js';
 import { DefaultDark } from './default.js';
+import { VSCodeDark } from './vscode-dark.js';
 import { ShadesOfPurple } from './shades-of-purple.js';
 import { XCode } from './xcode.js';
 import * as fs from 'node:fs';
@@ -33,7 +34,7 @@ export interface ThemeDisplay {
   isCustom?: boolean;
 }
 
-export const DEFAULT_THEME: Theme = DefaultDark;
+export const DEFAULT_THEME: Theme = VSCodeDark;
 
 class ThemeManager {
   private readonly availableThemes: Theme[];
@@ -42,6 +43,7 @@ class ThemeManager {
 
   constructor() {
     this.availableThemes = [
+      VSCodeDark,
       AyuDark,
       AyuLight,
       AtomOneDark,

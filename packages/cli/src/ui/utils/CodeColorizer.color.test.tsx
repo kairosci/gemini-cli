@@ -40,7 +40,7 @@ vi.mock('../hooks/useAlternateBuffer.js', () => ({
 }));
 
 describe('CodeColorizer Colors', () => {
-  it('renders JS keywords with AccentBlue', () => {
+  it('renders JS keywords with AccentPurple', () => {
     const code = 'const a = 1;';
     const result = colorizeCode({
       code,
@@ -54,9 +54,9 @@ describe('CodeColorizer Colors', () => {
 
     const html = renderToStaticMarkup(result as React.ReactElement);
 
-    // Check for 'const' wrapped in AccentBlue (#89B4FA -> #89b4fa)
+    // Check for 'const' wrapped in AccentPurple (#CBA6F7 -> #cba6f7)
     expect(html).toContain(
-      `data-color="${darkTheme.AccentBlue.toLowerCase()}">const</span>`,
+      `data-color="${darkTheme.AccentPurple.toLowerCase()}">const</span>`,
     );
   });
 
@@ -79,7 +79,7 @@ describe('CodeColorizer Colors', () => {
     );
   });
 
-  it('renders Python keywords with AccentBlue', () => {
+  it('renders Python keywords with AccentPurple', () => {
     const code = 'def foo(): pass';
     const result = colorizeCode({
       code,
@@ -93,10 +93,10 @@ describe('CodeColorizer Colors', () => {
 
     const html = renderToStaticMarkup(result as React.ReactElement);
     expect(html).toContain(
-      `data-color="${darkTheme.AccentBlue.toLowerCase()}">def</span>`,
+      `data-color="${darkTheme.AccentPurple.toLowerCase()}">def</span>`,
     );
     expect(html).toContain(
-      `data-color="${darkTheme.AccentBlue.toLowerCase()}">pass</span>`,
+      `data-color="${darkTheme.AccentPurple.toLowerCase()}">pass</span>`,
     );
   });
 
